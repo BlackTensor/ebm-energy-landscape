@@ -1,0 +1,40 @@
+Picture a car driving toward a destination. There's an obstacle in the road.
+
+A human knows what to do. Go left around it, or go right. Both work. Both get you there.
+
+Now train a regression model on that data. Some drivers went left. Some went right. The model sees both, and it does the most reasonable thing a regression model can do: it averages them.
+
+The average of "go left" and "go right" is "go straight."
+
+So the model drives directly into the obstacle. It learned from two correct answers and produced the one answer that gets you killed.
+
+This is the multimodal output problem. When a situation has multiple valid answers, standard models don't pick one. They blend them into a single output that often satisfies none of them. The averaging that makes regression work on clean data is exactly what breaks it when the truth is "any of these, but not the thing in between."
+
+Energy-Based Models take a different stance. Instead of predicting one answer, an EBM learns a landscape.
+
+It doesn't output a trajectory. It scores them. Every possible path gets an energy value. Low energy means valid. High energy means invalid. The model never has to commit to a single route. It just maps out which routes are good and which are not, across the entire space of possibilities.
+
+Why "energy"? Because it behaves like physics. Imagine a ball on uneven terrain. Let it go and it rolls downhill until it settles in the lowest point it can find. Valid trajectories are the valleys. Invalid ones are the ridges you'd never roll into. The model isn't memorizing a destination. It's learning the shape of the terrain.
+
+And here's the part that solves the original problem. A landscape can have many valleys. Going left is one valley. Going right is another. They're both low energy, both valid, and they sit there side by side, fully preserved. Nothing gets averaged. Nothing collapses. Every distinct answer keeps its own place in the terrain.
+
+So I built one to see it work.
+
+The model is a CNN that reads the scene, a bidirectional LSTM that reads the trajectory, and an MLP that turns both into a single energy value. Around 458K parameters. I trained it on synthetic grid-world navigation scenes, where the job was to assign an energy to any path through any scene.
+
+Training it was the interesting part. The obvious approach is contrastive divergence, where you generate fake "negative" paths by sampling from the model itself. That failed. Early on the landscape isn't sampleable. There are no clean valleys to roll into yet, so the negatives were garbage and the model had nothing to learn from.
+
+So I pivoted to multi-scale denoising score matching. Instead of sampling negatives, you take valid paths, add noise at several different scales, and teach the model to point back toward the clean version. You're teaching it the slope of the landscape directly rather than hoping to stumble into the valleys. That worked.
+
+Then comes the magic: Langevin dynamics. Start with a completely random, chaotic path. Then repeatedly nudge it downhill along the energy gradient, with a little noise mixed in so it can explore. Step by step, the chaos slides downhill through the energy field and settles into a valid route.
+
+From a single scene, 8 distinct valid trajectories emerged. On the best scene, 16 random starting seeds settled into 9 distinct modes. Different valleys, different valid futures, all from one model. It genuinely learned a landscape of answers, not a single answer.
+
+The numbers: 120 epochs, around 458K parameters, a final energy gap of +2.606 between valid and invalid paths, and 0.806 accuracy separating the two.
+
+I recorded the Langevin descent so you can watch it happen. Tangled random paths untangling themselves, sliding into the valleys, becoming valid routes in real time. There's also a live interactive visualizer where you can explore the energy landscape yourself, see the heatmap, and watch the multiple distinct solutions fan out from one scene.
+
+Have a look:
+https://blacktensor.github.io/ebm-energy-landscape/
+
+#MachineLearning #EnergyBasedModels #DeepLearning #GenerativeAI #AI
