@@ -1,58 +1,71 @@
 # Energy Landscape Visualizer
 
-A Continuous Energy-Based Model (EBM) for multimodal trajectory generation, with a premium dark-themed web visualizer. Built entirely on free tooling.
+**A trajectory model that learns the landscape of every valid future, not a single averaged guess.**
 
-> Full documentation, run instructions, and screenshots are added in a later phase. See `CLAUDE.md` for the build plan.
+[**Live demo →** blacktensor.github.io/ebm-energy-landscape](https://blacktensor.github.io/ebm-energy-landscape/)
+
+![Energy landscape with descending trajectories](assets/environment_preview.png)
 
 ---
 
-## Running training on Google Colab (free GPU)
+## What it is
 
-The entire training side is designed to run end to end on Colab's free GPU tier — no
-paid compute, no local GPU required. The reproducible runtime steps are:
+Most trajectory predictors regress to one path. When several routes are equally valid, that one answer is the *average* of them — a path that threads between the real options and matches none.
 
-1. **Open the notebook in Colab.** Upload `training/notebook.ipynb` to
-   [colab.research.google.com](https://colab.research.google.com), or open it directly from
-   GitHub via `File > Open notebook > GitHub`.
+This project takes the energy-based approach instead. A network learns a scalar **energy** `E(scene, trajectory)`: low for plausible routes, high for bad ones. Training carves valleys into that landscape wherever valid trajectories live. To *generate* a path, **Langevin dynamics** starts from a random scribble and walks downhill in the energy —
 
-2. **Switch to a GPU runtime.** `Runtime > Change runtime type > Hardware accelerator > GPU`,
-   then `Save`. The free tier typically allocates an NVIDIA T4.
+```
+path ← path − lr · ∇E(path) + noise
+```
 
-3. **Get the code into the session.** Either clone the repo or upload the `training/` folder:
+— until it settles into a valley. Because the landscape is multimodal, different random starts settle into different valleys, so one model produces many distinct valid routes for the same scene. The energy is trained by **denoising score matching** (perturb valid paths across a noise ladder, learn to point back), which gives a smooth, descendable field rather than isolated spikes.
 
-   ```bash
-   !git clone https://github.com/<your-user>/ebm-energy-landscape.git
-   %cd ebm-energy-landscape
-   ```
+The web app visualizes all of it: the live energy heatmap, trajectories animating from chaos into the valleys, the fan of distinct routes, and a side-by-side of regression's one averaged line against the EBM's many.
 
-4. **Install pinned dependencies.** Colab ships most of these, but installing from the
-   pinned file guarantees reproducibility:
+## Architecture
 
-   ```bash
-   !pip install -r requirements.txt
-   ```
+`E(scene, trajectory) → scalar`, three stages joined by an MLP head (**~458K parameters**):
 
-5. **Confirm the GPU is live before training.** Run this check in a cell — it must report
-   `CUDA available: True` and name the device:
+| Stage | Component | Role |
+|---|---|---|
+| Map encoder | CNN | Rasterizes start / goal / obstacles to a multi-channel image, convolves to a scene embedding |
+| Trajectory encoder | Bidirectional LSTM | Reads the ordered `(x, y)` points (with per-step velocity), pools to a sequence embedding |
+| Energy head | MLP | Concatenates both embeddings, emits one scalar energy |
 
-   ```python
-   import torch
-   print("torch:", torch.__version__)
-   print("CUDA available:", torch.cuda.is_available())
-   if torch.cuda.is_available():
-       print("Device:", torch.cuda.get_device_name(0))
-   ```
+Design notes: **GroupNorm** (not BatchNorm) so single-sample Langevin evaluation never couples samples through batch statistics; **SiLU** activations for a smooth, jitter-free gradient to descend; the map branch carries no trajectory gradient since the scene is fixed conditioning.
 
-6. **Run training.** Execute the notebook cells (or `python training/train.py`) top to
-   bottom. The trained model weights are written to `exports/energy_model.pt`; the
-   notebook's final cell downloads that file out of the Colab session. The checkpoint
-   bundles the weights, the architecture kwargs needed to rebuild the network, the full
-   per-epoch training history, and the final metrics, and reloads via
-   `train.load_checkpoint`.
+## Results
 
-> Runtime confirmed: Colab's free GPU tier provides a CUDA-capable device (T4) that
-> satisfies the pinned `torch==2.3.1` build, and all dependencies in `requirements.txt`
-> install on that runtime. The training code is device-agnostic — `train.py` selects CUDA
-> when present and falls back to CPU with the same code path — so the end-to-end run
-> (Task 3.3) is reproducible on the free GPU and verifiable locally. Weight files are
-> regenerated artifacts and are git-ignored (`*.pt`), not committed.
+- **Energy gap +2.606** between valid and bad trajectories — real, sustained separation, not collapsed.
+- **Accuracy 0.806** ranking valid below bad.
+- **8 distinct valid routes** sampled for a single scene (the multi-sample view).
+- **9 distinct modes from 16 seeds** on the best scene — confirming the landscape is genuinely multimodal, the core claim of the project.
+
+## Reproduce
+
+Training runs end to end on **Google Colab's free GPU tier** — no paid compute, no local GPU. The code is device-agnostic (CUDA when present, CPU otherwise, same path).
+
+```bash
+git clone https://github.com/BlackTensor/ebm-energy-landscape.git
+cd ebm-energy-landscape
+pip install -r requirements.txt
+
+python training/train.py      # synthesize data, train, write exports/energy_model.pt
+python training/export.py     # write the JSON bundle (heatmap, scene, routes, descent) to exports/
+```
+
+Or open `training/notebook.ipynb` in Colab (`Runtime → Change runtime type → GPU`), then run top to bottom. Data is fully synthetic and generated in code — nothing to download.
+
+Run the web app locally:
+
+```bash
+cd web
+npm install
+npm run dev
+```
+
+The app reads the exported JSON from `web/public/data/`.
+
+## Tech stack
+
+PyTorch · NumPy · React · Vite · GitHub Pages (CI-deployed to the `gh-pages` branch). Entirely free tooling, end to end.
