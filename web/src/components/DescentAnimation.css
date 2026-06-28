@@ -1,0 +1,134 @@
+.descent {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+/* The path overlay fills the framed, clipped square set by .heatmap. */
+.descent-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.descent-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Controls read like instrument keys printed on the survey sheet. */
+.descent-play {
+  flex: none;
+  min-width: 5.25rem;
+  padding: 0.5rem 0.95rem;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  letter-spacing: 0.1em;
+  color: var(--ink);
+  background: var(--paper-raised);
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  cursor: pointer;
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    transform 80ms ease;
+}
+
+.descent-play:hover {
+  background: #ece3d0;
+  border-color: var(--slate);
+}
+
+.descent-play:active {
+  transform: translateY(1px);
+}
+
+/* Range input, styled to read like a survey gauge track rather than a default
+   slider. The thumb is neutral ink with a paper ring so it reads on the track. */
+.descent-scrub {
+  flex: 1;
+  appearance: none;
+  -webkit-appearance: none;
+  height: 0.4rem;
+  border-radius: 999px;
+  background: var(--paper-sunken);
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+  cursor: pointer;
+}
+
+.descent-scrub::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 0.95rem;
+  height: 0.95rem;
+  border-radius: 50%;
+  background: var(--ink);
+  border: 2px solid var(--paper-raised);
+  box-shadow: 0 1px 3px rgba(42, 38, 32, 0.5);
+}
+
+.descent-scrub::-moz-range-thumb {
+  width: 0.95rem;
+  height: 0.95rem;
+  border-radius: 50%;
+  background: var(--ink);
+  border: 2px solid var(--paper-raised);
+}
+
+/* Readout — set like a row of measurements in a survey table. */
+.descent-readout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 2.25rem;
+  margin: 0;
+  padding-top: 0.25rem;
+}
+
+.readout-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.readout-cell dt {
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.readout-cell dd {
+  margin: 0;
+  font-size: 1.05rem;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.readout-dim {
+  color: var(--muted);
+}
+
+.readout-phase {
+  margin-left: auto;
+  text-align: right;
+}
+
+.readout-phase dd {
+  letter-spacing: 0.1em;
+}
+
+/* On narrow screens keep the three readout cells on one line and shrink the
+   numbers a touch so nothing wraps under the slider. */
+@media (max-width: 480px) {
+  .descent-readout {
+    gap: 0.5rem 1.25rem;
+  }
+
+  .readout-cell dd {
+    font-size: 0.95rem;
+  }
+}

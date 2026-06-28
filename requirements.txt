@@ -1,0 +1,9 @@
+# EBM Energy Landscape — training dependencies
+# Pinned to versions known to install and run on the Google Colab free tier
+# (Python 3.10/3.11, CUDA 12.x runtime). numpy is held at 1.26.x to stay
+# binary-compatible with this torch build and avoid the numpy 2.0 ABI break.
+
+torch==2.3.1
+numpy==1.26.4
+matplotlib==3.8.4
+plotly==5.22.0

@@ -1,0 +1,296 @@
+.instrument {
+  min-height: 100%;
+  max-width: 920px;
+  margin: 0 auto;
+  padding: clamp(2rem, 6vw, 5rem) clamp(1.25rem, 5vw, 2.75rem);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2.25rem, 6vw, 4rem);
+}
+
+/* Masthead — reads like the header block of a field-survey document. */
+.masthead {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-bottom: clamp(1.25rem, 3vw, 1.75rem);
+  /* A printed double rule closes the header block. */
+  border-bottom: 1px solid var(--line-strong);
+  box-shadow: 0 3px 0 -2px var(--line);
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--slate);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+}
+
+.title {
+  font-size: clamp(2.6rem, 8vw, 4.75rem);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.015em;
+  /* Solid-ink fallback: the title is fully legible if the contour treatment
+     below is unsupported or suppressed. */
+  color: var(--ink);
+}
+
+/* Topographic title — the display type is filled with the same elevation ramp
+   the heatmaps use (deep water-blue -> teal -> moss -> sage -> warm sand ->
+   terracotta/clay) sweeping across the word, with fine horizontal contour
+   striations stroked over it as darker ink lines (every 5px), so the heading
+   reads as tinted relief with contour lines and visibly belongs to the maps
+   below. The ramp is tuned a shade deeper than the raw colormap so every band
+   keeps contrast against the parchment. Gated behind background-clip support and
+   prefers-reduced-motion: no-preference, so any unsupported or motion-sensitive
+   context keeps the solid-ink fallback. */
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  @media (prefers-reduced-motion: no-preference) {
+    .title {
+      background-image:
+        repeating-linear-gradient(
+          177deg,
+          transparent 0,
+          transparent 4px,
+          rgba(42, 38, 32, 0.32) 4px,
+          rgba(42, 38, 32, 0.32) 5px
+        ),
+        linear-gradient(
+          95deg,
+          #173a5a 0%,
+          #1f6360 20%,
+          #3a7a4f 40%,
+          #6e7d3d 58%,
+          #b07636 78%,
+          #b0432a 100%
+        );
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+    }
+  }
+}
+
+.lede {
+  max-width: 56ch;
+  color: var(--ink-soft);
+  font-size: clamp(1.05rem, 2.4vw, 1.25rem);
+  line-height: 1.6;
+}
+
+/* Byline — the author's credit on the instrument, in the survey-data (mono)
+   voice. A short lead rule sets it apart as a proper credit line; sized and
+   weighted a step up from fine print so it reads clearly as a signature, while
+   staying disciplined enough not to compete with the title. */
+.byline {
+  margin-top: 0.55rem;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+}
+
+.byline::before {
+  content: '';
+  width: 1.65rem;
+  height: 1px;
+  flex: none;
+  background: var(--line-strong);
+}
+
+/* Jump control — a prominent survey-instrument control in the hero that
+   navigates to the standalone method page. Sits below the byline, above the
+   first plate. */
+.jump-build {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: clamp(-1.25rem, -2vw, -0.5rem);
+  padding: 0.75rem 1.2rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink);
+  text-decoration: none;
+  background: var(--paper-raised);
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.5) inset;
+  transition: background 160ms ease, border-color 160ms ease, transform 120ms ease;
+}
+
+.jump-build::after {
+  content: '→';
+  font-size: 0.95rem;
+  color: var(--slate);
+}
+
+.jump-build:hover {
+  background: var(--paper);
+  border-color: var(--slate);
+}
+
+.jump-build:active {
+  transform: translateY(1px);
+}
+
+/* Results-page header — the same document furniture as the masthead, opening
+   with a Back control that returns to the landscape. */
+.results-head {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+  padding-bottom: clamp(1.25rem, 3vw, 1.75rem);
+  border-bottom: 1px solid var(--line-strong);
+  box-shadow: 0 3px 0 -2px var(--line);
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 1.05rem;
+  font-size: 0.76rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink);
+  text-decoration: none;
+  background: var(--paper-raised);
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.5) inset;
+  transition: background 160ms ease, border-color 160ms ease, transform 120ms ease;
+}
+
+.back-link::before {
+  content: '←';
+  font-size: 0.95rem;
+  color: var(--slate);
+}
+
+.back-link:hover {
+  background: var(--paper);
+  border-color: var(--slate);
+}
+
+.back-link:active {
+  transform: translateY(1px);
+}
+
+/* Hero — the energy relief plate and its energy key. The plate is the one bold
+   element; the survey furniture around it stays quiet. */
+.hero {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  max-width: 620px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.hero-placeholder {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 3px;
+  background: var(--plate);
+  box-shadow:
+    0 0 0 1px var(--line-strong),
+    inset 0 0 0 1px var(--plate-line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--paper-sunken);
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
+  text-align: center;
+  padding: 1rem;
+}
+
+/* Energy scale — the colour key, sampled from the same colormap as the canvas. */
+.scale {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.scale-bar {
+  flex: 1;
+  height: 0.5rem;
+  border-radius: 2px;
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+}
+
+.scale-end {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.scale-end-high {
+  text-align: right;
+}
+
+/* Multimodality section — the static multi-sample plate. */
+.sample {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  max-width: 620px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.sample-head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.sample-title {
+  font-size: clamp(1.65rem, 4vw, 2.25rem);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.sample-note {
+  color: var(--ink-soft);
+  font-size: clamp(1rem, 2.2vw, 1.1rem);
+  line-height: 1.6;
+}
+
+.sample-note .mono {
+  color: var(--ink);
+}
+
+/* Plate caption — set like a printed figure label beneath the plate. */
+.sample-caption {
+  margin: 0;
+  text-align: center;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  color: var(--muted);
+}
+
+/* Footer — the survey document's colophon strip. */
+.status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  margin-top: auto;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--line-strong);
+  box-shadow: 0 -3px 0 -2px var(--line);
+  color: var(--muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+}

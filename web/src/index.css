@@ -1,0 +1,84 @@
+/* Global base — minimal reset plus the field-survey resting state. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  /* Warm parchment, overlaid with a very faint survey grid so the page reads as
+     field paper / terrain rather than an empty surface. */
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(rgba(42, 38, 32, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(42, 38, 32, 0.035) 1px, transparent 1px),
+    linear-gradient(rgba(78, 98, 117, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(78, 98, 117, 0.05) 1px, transparent 1px);
+  background-size:
+    132px 132px,
+    132px 132px,
+    33px 33px,
+    33px 33px;
+  background-position: -1px -1px;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-synthesis: none;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  line-height: 1.08;
+  margin: 0;
+}
+
+p {
+  margin: 0;
+}
+
+em,
+i {
+  font-style: italic;
+}
+
+/* Monospace is reserved for survey data: energy values, coordinates, counters. */
+.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Visible keyboard focus is part of the quality floor — slate, not an energy
+   accent, so the meaning of valley/ridge green/orange is never diluted. */
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Motion is restrained, and reduced-motion is respected everywhere. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,92 @@
+/* The plate mount — a warm paper mat the dark relief plate sits on, the way a
+   printed plate is mounted in a survey atlas. The mat (padding) reserves real
+   layout space, so plates never crowd their neighbours. Survey corner ticks are
+   drawn in the mat's margin. */
+.plate-mount {
+  position: relative;
+  width: 100%;
+  padding: clamp(0.55rem, 2.2%, 0.95rem);
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.5) inset,
+    0 18px 38px -26px rgba(42, 38, 32, 0.55);
+}
+
+/* Survey registration ticks at the mat corners — small crosshair marks, drawn in
+   muted ink so they read as document furniture, not decoration competing with
+   the field. */
+.plate-mount::before,
+.plate-mount::after {
+  content: '';
+  position: absolute;
+  inset: clamp(0.28rem, 1.3%, 0.5rem);
+  pointer-events: none;
+  background:
+    linear-gradient(var(--line-strong), var(--line-strong)) left top / 9px 1px no-repeat,
+    linear-gradient(var(--line-strong), var(--line-strong)) left top / 1px 9px no-repeat,
+    linear-gradient(var(--line-strong), var(--line-strong)) right top / 9px 1px no-repeat,
+    linear-gradient(var(--line-strong), var(--line-strong)) right top / 1px 9px no-repeat;
+}
+.plate-mount::after {
+  background:
+    linear-gradient(var(--line-strong), var(--line-strong)) left bottom / 9px 1px no-repeat,
+    linear-gradient(var(--line-strong), var(--line-strong)) left bottom / 1px 9px no-repeat,
+    linear-gradient(var(--line-strong), var(--line-strong)) right bottom / 9px 1px no-repeat,
+    linear-gradient(var(--line-strong), var(--line-strong)) right bottom / 1px 9px no-repeat;
+}
+
+.heatmap {
+  position: relative;
+  width: 100%;
+  margin: 0;
+  aspect-ratio: 1 / 1;
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--plate);
+  /* An integrated relief frame rather than a hard border: a soft keyline at the
+     field's edge, a top-edge catch-light, and a graded inner shadow that seats
+     the terrain into the mat — so the plate reads as recessed paper, not a
+     pasted-on rectangle. */
+  box-shadow:
+    0 0 0 1px var(--line-strong),
+    0 10px 26px -18px rgba(42, 38, 32, 0.55);
+  /* Page-load reveal of the landscape (restrained; disabled by the global
+     prefers-reduced-motion guard in index.css). */
+  animation: heatmap-reveal 760ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+/* The relief overlay — an inset edge shadow with a faint top catch-light, drawn
+   over the canvas so the field appears pressed into the plate. Kept gentle and
+   directional (deeper at the foot) so the ink start/goal markers in the upper
+   corners stay clear. Non-interactive. */
+.heatmap::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  box-shadow:
+    inset 0 1px 0 0 rgba(231, 224, 206, 0.1),
+    inset 0 0 0 1px var(--plate-line),
+    inset 0 -22px 30px -22px rgba(0, 0, 0, 0.55),
+    inset 0 14px 26px -24px rgba(0, 0, 0, 0.4);
+}
+
+.heatmap-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes heatmap-reveal {
+  from {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

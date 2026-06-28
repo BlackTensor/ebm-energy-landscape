@@ -1,0 +1,48 @@
+/*
+ * theme.css — the "field survey" design identity for the Energy Landscape visualizer.
+ *
+ * The page is a naturalist's field-survey document: a warm parchment environment
+ * with earthy ink, sage/slate supporting tones, and the energy renders mounted as
+ * dark relief plates on paper mats. The aesthetic lives in the environment around
+ * the canvas; the canvas itself is untouched.
+ *
+ * Hard rule: the two energy accents (--valley, --ridge) carry energy meaning ONLY
+ * (low/valid vs high/invalid) and must never be used decoratively. The supporting
+ * terrain tones (--sage, --slate) handle anything environmental; --focus handles
+ * keyboard focus. Everything else stays in the paper / ink range.
+ */
+
+:root {
+  /* Parchment environment — warm paper surfaces */
+  --paper: #e8dfcd; /* page base — warm parchment / soft stone */
+  --paper-raised: #f3ecdd; /* cards, plate mats, controls */
+  --paper-sunken: #ddd3bd; /* footer well, slider track */
+  --plate: #0e1320; /* dark relief-plate well (matches the colormap floor) */
+
+  /* Ink — earthy, document-like, never stark white-on-black */
+  --ink: #2a2620; /* primary text — warm iron-gall near-black */
+  --ink-soft: #4c4434; /* secondary headings, strong body */
+  --muted: #7b6f57; /* labels, captions, secondary text */
+
+  /* Keylines — warm rules on paper, hairlines on the dark plate */
+  --line: rgba(42, 38, 32, 0.16); /* hairline keyline on paper */
+  --line-strong: rgba(42, 38, 32, 0.34); /* plate / section keylines */
+  --plate-line: rgba(231, 224, 206, 0.14); /* hairline on the dark plate */
+
+  /* Supporting terrain tones — environment, never energy */
+  --sage: #7c8a6b; /* moss / sage */
+  --slate: #4e6275; /* slate-blue */
+  --focus: #3a5266; /* keyboard focus — slate, not an energy accent */
+
+  /* Energy accents — meaning ONLY (valley = low/valid, ridge = high/invalid) */
+  --valley: #3dd2a4;
+  --ridge: #e8633a;
+
+  /* Type — display serif (field-guide headers, big numbers), body serif, and
+     monospace for survey data (coordinates, energy values, step counters). */
+  --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-body: 'Spectral', Georgia, 'Times New Roman', serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+  color-scheme: light;
+}
