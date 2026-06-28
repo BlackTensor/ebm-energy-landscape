@@ -11,9 +11,11 @@ on:
       - '.github/workflows/deploy.yml'
   workflow_dispatch:
 
-# Allow the action to push the built site to the gh-pages branch.
+# contents:write lets the action push the built site to the gh-pages branch;
+# pages:write lets the enable step point Pages at that branch via the REST API.
 permissions:
   contents: write
+  pages: write
 
 # Never run two deploys at once; let the newest win.
 concurrency:
@@ -48,3 +50,27 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./web/dist
           publish_branch: gh-pages
+
+      # Point GitHub Pages at the gh-pages branch. Best-effort: if the token
+      # lacks admin rights this prints the HTTP status and the deploy still
+      # succeeds (the branch is published either way).
+      - name: Enable Pages from gh-pages branch
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          body='{"source":{"branch":"gh-pages","path":"/"}}'
+          code=$(curl -s -o /tmp/pages.json -w '%{http_code}' -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            "https://api.github.com/repos/$REPO/pages" -d "$body")
+          echo "POST /pages -> $code"
+          if [ "$code" = "409" ] || [ "$code" = "422" ]; then
+            code=$(curl -s -o /tmp/pages.json -w '%{http_code}' -X PUT \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              "https://api.github.com/repos/$REPO/pages" -d "$body")
+            echo "PUT /pages -> $code"
+          fi
+          cat /tmp/pages.json || true
